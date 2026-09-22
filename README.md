@@ -4,7 +4,7 @@ This repository provides worked examples for analysing Genomics England (GEL) Ag
 
 The example phenotype is **cutaneous melanoma (`CM`)**, coded as a binary trait. The scripts contain analysis-specific phenotype names, covariates, paths, and scientific settings. Treat this repository as an example to adapt and validate for your study.
 
-**The repository is a collection of separately submitted workflows and interactive preparation scripts. Running the root `main.nf` runs rare ncRNA/pseudogene exonic association testing only. It does not run QC, Step 1, or GWAS automatically.**
+**The repository is a collection of separately submitted workflows and interactive preparation scripts. The repository root has no default workflow. Select the entry script and companion configuration for the stage you want to run.**
 
 ## 📚 Contents
 
@@ -31,7 +31,7 @@ The example phenotype is **cutaneous melanoma (`CM`)**, coded as a binary trait.
 | VEP annotation extraction | [`WGS-RV-pipeline/RV-protein-coding/Extract.VEP.Annotations/scripts/main.nf`](WGS-RV-pipeline/RV-protein-coding/Extract.VEP.Annotations/scripts/main.nf) | `nextflow.config` in that same directory |
 | Rare protein-coding association | [`WGS-RV-pipeline/RV-protein-coding/RV-protein-coding.main.nf`](WGS-RV-pipeline/RV-protein-coding/RV-protein-coding.main.nf) | `RV-protein-coding-nextflow.config` in that same directory |
 | Rare melanocyte cCRE association | [`WGS-RV-pipeline/RV-cCRE/RV-cCRE.main.nf`](WGS-RV-pipeline/RV-cCRE/RV-cCRE.main.nf) | `RV-cCRE-nextflow.config` in that same directory |
-| Rare ncRNA/pseudogene exonic association | [`main.nf`](main.nf) at repository root | [`nextflow.config`](nextflow.config) at repository root |
+| Rare ncRNA/pseudogene exonic association | [`WGS-RV-pipeline/RV-ncRNA/main.nf`](WGS-RV-pipeline/RV-ncRNA/main.nf) | [`WGS-RV-pipeline/RV-ncRNA/nextflow.config`](WGS-RV-pipeline/RV-ncRNA/nextflow.config) |
 
 Supporting files:
 
@@ -144,7 +144,7 @@ Do not supply the old `*_pred.list` in place of the LOCO file: its paths may ref
 ## ☁️ Submitting workflows on CloudOS
 
 1. Choose a stage from the repository map and record the source commit/tag. Make the required input files and directories available through your CloudOS workspace.
-2. Import your chosen GitHub workflow revision using your workspace's supported import procedure. Confirm **both** the entry script and its matching configuration; importing the unchanged repository root selects ncRNA association.
+2. Import your chosen GitHub workflow revision using your workspace's supported import procedure. Confirm **both** the entry script and its matching configuration; the repository root has no default entry script or configuration.
 3. The existing LD-pruning guide documents an import interface that expects root-level `main.nf` and `nextflow.config`. For that interface, prepare a **separate deployment copy or branch in your own fork**, placing the chosen stage's script/config at those root names and preserving supporting directories. For coding/cCRE workflows, this also means renaming their differently named entry/config files in that deployment copy. Keep the canonical source files in their original locations. If your workspace supports explicit script/config selection, use the pair in the table instead.
 4. Enter the stage's parameter names and values below. Choose file/directory inputs accessible to batch tasks; an interactive session's `/home/vscode/session_data/...` path is not automatically accessible in AWS Batch. Use workspace-resolved locations rather than inventing bucket paths.
 5. Confirm the execution backend, queue, work directory, container access, and resource allocation provided by CloudOS. The repository does not supply a complete standalone AWS account/queue setup. The VEP config explicitly sets `awsbatch`, `eu-west-2`, and `workDir='work'`; ensure CloudOS applies the correct workspace work directory and settings.
@@ -152,7 +152,7 @@ Do not supply the old `*_pred.list` in place of the LOCO file: its paths may ref
 
 The blocks below show **workflow parameters**, corresponding to Nextflow `--parameter value` arguments. In a form with separate name/value fields, enter the name without `--`. Replace every `/PATH/...` placeholder. They are not standalone shell commands and do not configure AWS execution.
 
-For a separately configured command-line Nextflow environment, the equivalent invocation is `nextflow run <entry-script> -c <matching-config> --parameter value ...`. Avoid accidentally loading this repository's root ncRNA config into another stage: run from an isolated stage deployment directory and inspect the resolved configuration. Do not use `-C` to discard CloudOS-generated configuration. See [Nextflow configuration](https://www.nextflow.io/docs/latest/config.html) and [command-line options](https://www.nextflow.io/docs/latest/cli.html).
+For a separately configured command-line Nextflow environment, the equivalent invocation is `nextflow run <entry-script> -c <matching-config> --parameter value ...`. Run from an isolated stage deployment directory and inspect the resolved configuration to confirm it matches the selected stage. Do not use `-C` to discard CloudOS-generated configuration. See [Nextflow configuration](https://www.nextflow.io/docs/latest/config.html) and [command-line options](https://www.nextflow.io/docs/latest/cli.html).
 
 Most workflows expose a `docker` profile for a separately provisioned local Docker environment. There is no general `cloudos` profile defined here; CloudOS supplies its execution settings.
 
@@ -486,7 +486,7 @@ For a **cCRE pilot**, select the cCRE workflow/config, retain the same six non-m
 --outdir /PATH/run01/pilot_cCRE
 ```
 
-For an **ncRNA pilot**, select the repository-root workflow/config, retain those six inputs, and use:
+For an **ncRNA pilot**, select `WGS-RV-pipeline/RV-ncRNA/main.nf` and its companion `WGS-RV-pipeline/RV-ncRNA/nextflow.config`, retain those six inputs, and use:
 
 ```text
 --mask_dir /PATH/REGENIE_ncRNA_masks/REGENIE_inputs
@@ -520,7 +520,7 @@ Validate every handoff before starting the next stage. A file-presence check or 
 
 | Check or symptom | What to inspect/do |
 | --- | --- |
-| Wrong analysis starts | Confirm the chosen entrypoint/config pair. Root is ncRNA, not a GWAS driver. |
+| Wrong analysis starts | Confirm the chosen entrypoint/config pair. The repository root has no default workflow; select a stage from the repository map. |
 | Missing input files | Verify directory level, chromosome naming, exact suffixes, and batch-accessible locations. Interactive paths do not automatically carry into batch tasks. |
 | QC/pruning completion | Check all 22 logs and summaries, sample counts, retained markers, and retained + removed = input variants. Do not use historical sample counts as expectations for a new cohort. |
 | LD combine fails but chromosome jobs succeeded | Inspect the known `find -type f`/symlink issue, validate all chromosome outputs, then combine lists manually as above. |
@@ -554,4 +554,4 @@ This README describes the checked-in implementation and existing stage documenta
 
 ## 💌 Contact
 
-Questions, feedback, or ideas? Contact **Shelley (Shiyu Zhang)** at [shiyuzhang0522@gmail.com](mailto:shiyuzhang0522@gmail.com), or [open a GitHub issue](https://github.com/shiyuzhang0522/Genomics.England.CloudOS.GWAS.REGENIE.Pipeline/issues/new).
+Questions, feedback, or ideas? Contact **Shelley (Shiyu Zhang)** at [shiyuzhang0522@gmail.com](mailto:shiyuzhang0522@gmail.com), or [open a GitHub issue](https://github.com/shiyuzhang0522/Genomics.England.CloudOS.GWAS.RVAT.REGENIE.Pipeline/issues/new).

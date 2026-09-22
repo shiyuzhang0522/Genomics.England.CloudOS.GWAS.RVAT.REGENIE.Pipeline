@@ -3,7 +3,7 @@ FROM condaforge/miniforge3:24.3.0-0
 
 LABEL maintainer="Shiyu Zhang"
 LABEL description="GEL VEP extraction tool environment"
-LABEL org.opencontainers.image.source="https://github.com/shiyuzhang0522/Genomics.England.CloudOS.GWAS.REGENIE.Pipeline"
+LABEL org.opencontainers.image.source="https://github.com/shiyuzhang0522/Genomics.England.CloudOS.GWAS.RVAT.REGENIE.Pipeline"
 
 
 ##############################################
